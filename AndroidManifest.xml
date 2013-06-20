@@ -20,6 +20,9 @@
         <receiver android:label="BackgroundServiceStarter" android:name=".BackgroundServiceStarter">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.android.camera.NEW_PICTURE" />
+                <action android:name="android.hardware.action.NEW_PICTURE" />
+                <data android:mimeType="image/*" />
             </intent-filter>
         </receiver>
         <activity

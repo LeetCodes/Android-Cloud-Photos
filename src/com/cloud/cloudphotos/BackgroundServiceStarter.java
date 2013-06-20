@@ -8,9 +8,21 @@ public class BackgroundServiceStarter extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            Intent serviceIntent = new Intent(context, BackgroundService.class);
-            context.startService(serviceIntent);
+    	String iName = intent.getAction();
+        if ("android.intent.action.BOOT_COMPLETED".equals(iName)) {
+            Intent i = new Intent(context, BackgroundService.class);
+            context.startService(i);
+        }
+        else if (
+            "android.hardware.action.NEW_PICTURE".equals(iName) ||
+            "com.android.camera.NEW_PICTURE".equals(iName)
+        ) {
+        	if (intent.getData() != null) {
+        		Intent i = new Intent(context, BackgroundService.class);
+            	i.setData(intent.getData());
+            	i.setAction(iName);
+            	context.startService(i);
+        	}
         }
     }
 }
