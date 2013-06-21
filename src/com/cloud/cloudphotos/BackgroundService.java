@@ -32,7 +32,6 @@ public class BackgroundService extends Service {
 		super.onCreate();
 		isRunning = true;
 		Log.v(TAG, "CloudPhotos service created");
-		notifyStarted();
 	}
 
 	@Override
@@ -40,6 +39,7 @@ public class BackgroundService extends Service {
 		if (intent != null && intent.getAction() != null
 				&& intent.getAction().endsWith("NEW_PICTURE")) {
 			try {
+				notifyStarted();
 				Uri uri = intent.getData();
 				String filePath = getPathFromUri(uri);
 				File photo = new File(filePath);
@@ -65,11 +65,11 @@ public class BackgroundService extends Service {
 	}
 
 	private void notifyStarted() {
-		Log.v(TAG, "CloudPhotos sending notification");
+		Log.v(TAG, "CloudPhotos Processing...");
 		Integer nId = (new Random()).nextInt(100) + 1;
 		Notification.Builder nBuilder = new Notification.Builder(this)
 				.setSmallIcon(R.drawable.ic_launcher).setAutoCancel(true)
-				.setTicker("CloudPhotos Service Started");
+				.setTicker("CloudPhotos Processing...");
 
 		NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		nManager.notify(nId, nBuilder.build());
