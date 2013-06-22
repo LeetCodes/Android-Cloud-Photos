@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="Please enter your credentials to access Rackspace Cloud Files below." />
+            android:text="@string/rackspace_enter_credentials" />
 
     </LinearLayout>
 
@@ -36,7 +36,7 @@
             android:layout_marginBottom="5dp"
             android:gravity="center_horizontal"
             android:visibility="gone"
-            android:text="You already have a Rackspace Cloud Account registered. Completing this will overwrite your current settings."
+            android:text="@string/rackspace_existing_account"
             android:textColor="#FF0000" />
 
     </LinearLayout>
@@ -47,12 +47,12 @@
 
         <EditText
             android:id="@+id/username"
-            android:layout_width="match_parent"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Username" >
+            android:hint="@string/username" >
     
             <requestFocus />
         </EditText>
@@ -65,12 +65,12 @@
 
         <EditText
             android:id="@+id/api_key"
-            android:layout_width="match_parent"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="API Key" >
+            android:hint="@string/apikey" >
     
         </EditText>
     </LinearLayout>
@@ -103,7 +103,7 @@
             android:layout_marginTop="15dp"
             android:gravity="center_horizontal"
             android:visibility="gone"
-            android:text="Please complete all fields and try again."
+            android:text="@string/complete_fields_try_again"
             android:textColor="#FF0000" />
 
     </LinearLayout>
@@ -112,6 +112,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        style="?android:attr/buttonBarStyle"
         android:background="#FFFFFF" >
     
         <Button
@@ -120,8 +121,9 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            style="?android:attr/buttonBarButtonStyle"
             android:background="@drawable/btn_rackspace"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:textColor="#fff" />
 
 	    <Button
@@ -130,8 +132,9 @@
 	        android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
 	        android:layout_weight="1"
+            style="?android:attr/buttonBarButtonStyle"
 	        android:background="@drawable/btn_blue"
-	        android:text="Save"
+	        android:text="@string/save"
 	        android:textColor="#fff" />
 
     </LinearLayout>
