@@ -1,5 +1,6 @@
 package com.cloud.cloudphotos;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -100,6 +101,7 @@ public class ApplicationConfig {
     /**
      * Initialise the edit of preferences.
      */
+    @SuppressLint("CommitPrefEdits")
     private void edit() {
         if (editor == null) {
             editor = prefs.edit();
