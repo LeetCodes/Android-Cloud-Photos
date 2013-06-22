@@ -13,4 +13,11 @@
         <item>United Kingdom (LON)</item>
     </string-array>
     <string name="rackspace_endpoint_prompt">Select Account Location</string>
+    <string name="rackspace_enter_credentials">Please enter your credentials to access Rackspace Cloud Files below.</string>
+    <string name="rackspace_existing_account">You already have a Rackspace Cloud Account registered. Completing this will overwrite your current settings.</string>
+    <string name="complete_fields_try_again">Please complete all fields and try again.</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="apikey">API Key</string>
+    <string name="username">Username</string>
 </resources>

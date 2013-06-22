@@ -12,8 +12,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.cloud.cloudphotos.provider.rackspace.Setup;
-
 public class CloudAccounts extends Activity {
 
     ApplicationConfig config;
@@ -48,11 +46,11 @@ public class CloudAccounts extends Activity {
 
     private void runRackspace() {
         ApplicationConfig config = new ApplicationConfig(getApplicationContext());
-        final Setup setup = new com.cloud.cloudphotos.provider.rackspace.Setup();
+        final com.cloud.cloudphotos.provider.rackspace.Setup setup = new com.cloud.cloudphotos.provider.rackspace.Setup();
         LayoutInflater inflater = getLayoutInflater();
         final View dialoglayout = inflater.inflate(R.layout.provider_rackspace_setup_prompt,
                 (ViewGroup) getCurrentFocus());
-        if (config.getBoolean(setup.PREFS_KEY_HAS_ACCOUNT, false) == true) {
+        if (config.getBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT, false) == true) {
             dialoglayout.findViewById(R.id.already_has).setVisibility(View.VISIBLE);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

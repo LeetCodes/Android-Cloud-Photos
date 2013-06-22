@@ -1,6 +1,5 @@
 package com.cloud.cloudphotos;
 
-import java.io.File;
 import java.util.Random;
 
 import android.app.Notification;
@@ -39,8 +38,8 @@ public class BackgroundService extends Service {
                 notifyStarted();
                 Uri uri = intent.getData();
                 String filePath = getPathFromUri(uri);
-                File photo = new File(filePath);
-                String fileName = photo.getName();
+                // File photo = new File(filePath);
+                // String fileName = photo.getName();
                 Log.v(TAG, "CloudPhotos photo detected.");
                 Log.v(TAG, "CloudPhotos file path:");
                 Log.v(TAG, filePath);
