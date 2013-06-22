@@ -87,6 +87,40 @@ public class ApplicationConfig {
     }
 
     /**
+     * Get a boolean, and return a default value if not present.
+     * 
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public Boolean getBoolean(String key, Boolean defaultValue) {
+        return prefs.getBoolean(key, defaultValue);
+    }
+
+    /**
+     * Set a boolean
+     * 
+     * @param key
+     * @param value
+     */
+    public void setBoolean(String key, Boolean value) {
+        edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+        return;
+    }
+
+    /**
+     * Unset a Boolean value
+     * 
+     * @param key
+     */
+    public void unsetBoolean(String key) {
+        unset(key);
+        return;
+    }
+
+    /**
      * Unset a value based on key name.
      * 
      * @param key
