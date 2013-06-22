@@ -99,7 +99,7 @@ public class CloudPhotos extends FragmentActivity {
     }
 
     /**
-     * Represents the Main Page Fragment TODO: This needs to be moved.
+     * Represents the Main Page Fragment
      */
     public static class CloudPhotosFragment_Main extends Fragment {
 
@@ -116,8 +116,7 @@ public class CloudPhotos extends FragmentActivity {
     }
 
     /**
-     * Represents the Storage Providers Page Fragment TODO: This needs to be
-     * moved.
+     * Represents the Storage Providers Page Fragment
      */
     public static class CloudPhotosFragment_StorageProviders extends Fragment {
 
@@ -134,7 +133,7 @@ public class CloudPhotos extends FragmentActivity {
     }
 
     /**
-     * Represents the Settings Page Fragment TODO: This needs to be moved.
+     * Represents the Settings Page Fragment
      */
     public static class CloudPhotosFragment_Settings extends Fragment {
 
