@@ -18,9 +18,9 @@ public class Setup {
      */
     public static String getAuthenticationEndpointFromString(String str) {
 
-        String us = "https://identity.api.rackspacecloud.com/v2.0/tokens";
+        String us = "https://identity.api.rackspacecloud.com/v1.0";
         if (str.equalsIgnoreCase("United Kingdom (LON)")) {
-            return "https://lon.identity.api.rackspacecloud.com/v2.0/tokens";
+            return "https://lon.identity.api.rackspacecloud.com/v1.0";
         }
 
         return us;
@@ -35,11 +35,11 @@ public class Setup {
      * @return
      */
     public Boolean areValidCredentials(String username, String apikey, String endpoint) {
-        Log.v("CloudPhotos", "Endpoint selected : " + endpoint);
         Log.v("CloudPhotos", "Endpoint URL : " + getAuthenticationEndpointFromString(endpoint));
         if (username.isEmpty() || apikey.isEmpty() || endpoint.isEmpty()) {
             return false;
         }
         return true;
     }
+
 }
