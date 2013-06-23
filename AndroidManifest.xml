@@ -51,7 +51,7 @@
         <activity
             android:name="com.cloud.cloudphotos.provider.rackspace.RackspaceChooseContainer"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/accounts" >
+            android:label="@string/choose_container" >
         </activity>
     </application>
 

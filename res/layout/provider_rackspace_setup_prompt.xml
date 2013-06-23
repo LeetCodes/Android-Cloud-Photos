@@ -9,9 +9,9 @@
     android:paddingTop="@dimen/activity_vertical_margin" >
 
     <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#FFFFFF" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF" >
 
         <TextView
             android:id="@+id/textView1"
@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:text="@string/rackspace_enter_credentials" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -32,13 +31,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:layout_marginTop="15dp"
             android:layout_marginBottom="5dp"
+            android:layout_marginTop="15dp"
             android:gravity="center_horizontal"
-            android:visibility="gone"
             android:text="@string/rackspace_existing_account"
-            android:textColor="#FF0000" />
-
+            android:textColor="#FF0000"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
@@ -46,77 +44,84 @@
         android:layout_height="wrap_content"
         android:background="#FFFFFF" >
 
-        <TextView
-            android:id="@+id/authentication_failed"
+        <ScrollView
+            android:id="@+id/scroll01"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:layout_marginTop="15dp"
             android:layout_marginBottom="5dp"
-            android:gravity="center_horizontal"
-            android:visibility="gone"
-            android:text="@string/rackspace_authentication_failed"
-            android:textColor="#FF0000" />
+            android:layout_marginTop="15dp" >
 
+            <TextView
+                android:id="@+id/authentication_failed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/rackspace_authentication_failed"
+                android:textColor="#FF0000"
+                android:visibility="gone" />
+        </ScrollView>
     </LinearLayout>
+
     <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#FFFFFF" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF" >
 
         <EditText
             android:id="@+id/username"
             android:layout_width="0dip"
-            android:singleLine="true"
-            android:imeOptions="actionNext"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="@string/username" >
-    
+            android:hint="@string/username"
+            android:imeOptions="actionNext"
+            android:singleLine="true" >
+
             <requestFocus />
         </EditText>
     </LinearLayout>
 
     <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#FFFFFF" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF" >
 
         <EditText
             android:id="@+id/api_key"
             android:layout_width="0dip"
-            android:singleLine="true"
-            android:imeOptions="actionNext"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="@string/apikey" >
-    
+            android:hint="@string/apikey"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/endpoint"
+            android:singleLine="true" >
         </EditText>
     </LinearLayout>
 
     <LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:background="#FFFFFF" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF" >
 
-	    <Spinner
-	        android:id="@+id/endpoint"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_marginTop="10dp"
-	        android:entries="@array/rackspace_endpoints"
-	        android:prompt="@string/rackspace_endpoint_prompt" />
-        
+        <Spinner
+            android:id="@+id/endpoint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:entries="@array/rackspace_endpoints"
+            android:prompt="@string/rackspace_endpoint_prompt" />
     </LinearLayout>
 
     <LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:background="#FFFFFF" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF" >
 
         <TextView
             android:id="@+id/error_text"
@@ -125,41 +130,39 @@
             android:layout_gravity="left"
             android:layout_marginTop="15dp"
             android:gravity="center_horizontal"
-            android:visibility="gone"
             android:text="@string/complete_fields_try_again"
-            android:textColor="#FF0000" />
-
+            android:textColor="#FF0000"
+            android:visibility="gone" />
     </LinearLayout>
-    
+
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        style="?android:attr/buttonBarStyle"
         android:background="#FFFFFF" >
-    
+
         <Button
             android:id="@+id/cancel"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            style="?android:attr/buttonBarButtonStyle"
             android:background="@drawable/btn_rackspace"
             android:text="@string/cancel"
             android:textColor="#fff" />
 
-	    <Button
-	        android:id="@+id/save"
-	        android:layout_width="0dp"
-	        android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-	        android:layout_weight="1"
+        <Button
+            android:id="@+id/save"
             style="?android:attr/buttonBarButtonStyle"
-	        android:background="@drawable/btn_blue"
-	        android:text="@string/save"
-	        android:textColor="#fff" />
-
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_blue"
+            android:text="@string/save"
+            android:textColor="#fff" />
     </LinearLayout>
 
 </LinearLayout>

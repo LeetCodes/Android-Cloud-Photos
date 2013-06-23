@@ -113,12 +113,12 @@ public class RackspaceCloudAccount {
         } else {
             builderFinal.cancel();
             Intent intent = new Intent(activityContext, RackspaceChooseContainer.class);
+            intent.putExtra("username", username);
+            intent.putExtra("apikey", apikey);
+            intent.putExtra("token", token);
+            intent.putExtra("storageUrl", storageUrl);
             activityContext.startActivity(intent);
             activityContext.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
-            Log.v("CloudPhotos", username);
-            Log.v("CloudPhotos", apikey);
-            Log.v("CloudPhotos", token);
-            Log.v("CloudPhotos", storageUrl);
         }
     }
 

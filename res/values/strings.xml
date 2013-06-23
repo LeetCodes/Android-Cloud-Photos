@@ -17,6 +17,7 @@
     <string name="rackspace_existing_account">You already have a Rackspace Cloud Account registered. Completing this will overwrite your current settings.</string>
     <string name="complete_fields_try_again">Please complete all fields and try again.</string>
     <string name="rackspace_authentication_failed">Authentication failed. Please check the values and try again.</string>
+    <string name="choose_container">Choose Container</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="apikey">API Key</string>
