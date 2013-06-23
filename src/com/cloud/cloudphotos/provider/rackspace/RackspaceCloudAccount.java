@@ -79,6 +79,7 @@ public class RackspaceCloudAccount {
                 String akey = apikey.getText().toString();
                 String epoint = endpoint.getItemAtPosition(endpoint.getSelectedItemPosition()).toString();
                 if (setup.areValidCredentials(uname, akey, epoint)) {
+                    dialoglayout.setVisibility(View.INVISIBLE);
                     String url = Setup.getAuthenticationEndpointFromString(epoint);
                     validateRackspace(uname, akey, url);
                 } else {
@@ -125,6 +126,7 @@ public class RackspaceCloudAccount {
      * Authentication failed, notify the user.
      */
     public void authenticationFailed() {
+        dialoglayout.setVisibility(View.VISIBLE);
         Log.v("CloudPhotos", "Authentication failed");
         TextView tv = (TextView) dialoglayout.findViewById(R.id.authentication_failed);
         tv.setVisibility(View.VISIBLE);
