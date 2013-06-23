@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.cloud.cloudphotos.ApplicationConfig;
 import com.cloud.cloudphotos.CloudAccounts;
-import com.cloud.cloudphotos.CloudPhotos;
 import com.cloud.cloudphotos.R;
 import com.cloud.cloudphotos.helper.SslFactory;
 import com.loopj.android.http.AsyncHttpClient;
@@ -115,7 +114,7 @@ public class RackspaceCloudAccount {
             authenticationFailed();
         } else {
             builderFinal.cancel();
-            Intent intent = new Intent(activityContext, CloudPhotos.class);
+            Intent intent = new Intent(activityContext, RackspaceChooseContainer.class);
             activityContext.startActivity(intent);
             activityContext.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
             Log.v("CloudPhotos", username);

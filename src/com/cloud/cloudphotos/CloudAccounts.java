@@ -31,7 +31,7 @@ public class CloudAccounts extends Activity {
     }
 
     private void bindProviders() {
-        RackspaceCloudAccount rackspace = new RackspaceCloudAccount(this);
+        new RackspaceCloudAccount(this);
     }
 
 }

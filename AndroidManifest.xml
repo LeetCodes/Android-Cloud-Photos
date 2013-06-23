@@ -47,6 +47,12 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/accounts" >
         </activity>
+
+        <activity
+            android:name="com.cloud.cloudphotos.provider.rackspace.RackspaceChooseContainer"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/accounts" >
+        </activity>
     </application>
 
 </manifest>
