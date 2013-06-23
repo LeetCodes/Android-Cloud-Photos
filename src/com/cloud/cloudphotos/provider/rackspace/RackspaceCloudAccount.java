@@ -1,7 +1,5 @@
 package com.cloud.cloudphotos.provider.rackspace;
 
-import java.security.KeyStore;
-
 import org.apache.http.Header;
 
 import android.app.AlertDialog;
@@ -19,7 +17,6 @@ import android.widget.TextView;
 import com.cloud.cloudphotos.ApplicationConfig;
 import com.cloud.cloudphotos.CloudAccounts;
 import com.cloud.cloudphotos.R;
-import com.cloud.cloudphotos.helper.SslFactory;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -141,18 +138,8 @@ public class RackspaceCloudAccount {
      * @param url
      */
     private void validateRackspace(final String username, final String apikey, final String url) {
-        AsyncHttpClient client = new AsyncHttpClient();
-        try {
-            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            trustStore.load(null, null);
-            SslFactory sf = new SslFactory(trustStore);
-            sf.setHostnameVerifier(SslFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            client.setSSLSocketFactory(sf);
-        } catch (Exception e) {
-
-        }
-        client.addHeader("X-Auth-User", username);
-        client.addHeader("X-Auth-Key", apikey);
+        RackspaceHttpClient httpClient = new RackspaceHttpClient();
+        AsyncHttpClient client = httpClient.getAuthenticationClient(username, apikey);
         client.get(url, new AsyncHttpResponseHandler() {
             private Boolean completed = false;
 
