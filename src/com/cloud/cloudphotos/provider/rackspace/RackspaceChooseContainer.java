@@ -2,6 +2,7 @@ package com.cloud.cloudphotos.provider.rackspace;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.http.Header;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.cloud.cloudphotos.ApplicationConfig;
 import com.cloud.cloudphotos.R;
+import com.cloud.cloudphotos.helper.ArrayListHashMapSort;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -109,12 +111,6 @@ public class RackspaceChooseContainer extends Activity {
         try {
             JSONArray array = new JSONArray(content);
             Integer countContainers = array.length();
-            HashMap<String, String> mapNew = new HashMap<String, String>();
-            mapNew.put("name", "Add New Container");
-            mapNew.put("count", "");
-            mapNew.put("bytes", "");
-            mapNew.put("type", "add");
-            containerList.add(mapNew);
             for (Integer i = 0; i < countContainers; i++) {
                 HashMap<String, String> map = new HashMap<String, String>();
                 JSONObject container = array.getJSONObject(i);
@@ -133,6 +129,14 @@ public class RackspaceChooseContainer extends Activity {
             Log.v("CloudPhotos", e.getStackTrace().toString());
             errorRetrieving();
         }
+        Collections.sort(containerList, new ArrayListHashMapSort("name"));
+        HashMap<String, String> mapNew = new HashMap<String, String>();
+        mapNew.put("name", "Add New Container");
+        mapNew.put("count", "");
+        mapNew.put("bytes", "");
+        mapNew.put("type", "add");
+        containerList.add(0, mapNew);
+
         ContainerListAdapter adapter = new ContainerListAdapter(this, containerList);
         list = (ListView) findViewById(R.id.list);
         list.setAdapter(adapter);
