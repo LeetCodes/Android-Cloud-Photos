@@ -1,7 +1,11 @@
 package com.cloud.cloudphotos;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.util.Random;
+
+import org.apache.http.Header;
+import org.apache.http.entity.FileEntity;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,10 +17,17 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
+
+import com.cloud.cloudphotos.provider.rackspace.RackspaceHttpClient;
+import com.cloud.cloudphotos.provider.rackspace.Setup;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
 public class BackgroundService extends Service {
 
     static boolean isRunning = false;
+    private ApplicationConfig config;
 
     private final String TAG = "CloudPhotos";
 
@@ -35,12 +46,14 @@ public class BackgroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null && intent.getAction().endsWith("NEW_PICTURE")) {
+            config = new ApplicationConfig(this.getApplicationContext());
             try {
                 notifyStarted();
                 Uri uri = intent.getData();
                 String filePath = getPathFromUri(uri);
-                //File photo = new File(filePath);
-                // String fileName = photo.getName();
+                File photo = new File(filePath);
+                String fileName = photo.getName();
+                runProviders(photo, fileName);
                 Log.v(TAG, "CloudPhotos photo detected.");
                 Log.v(TAG, "CloudPhotos file path:");
                 Log.v(TAG, filePath);
@@ -87,5 +100,75 @@ public class BackgroundService extends Service {
             int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             return cursor.getString(idx);
         }
+    }
+
+    private void runProviders(File file, String fileName) {
+        try {
+            runRackspace(file, fileName);
+        } catch (Exception e) {
+        }
+    }
+
+    private void runRackspace(File file, String fileName) {
+        Log.v("CloudPhotos", "Running Rackspace Upload");
+        RackspaceHttpClient clientFactory = new RackspaceHttpClient();
+        Setup setup = new com.cloud.cloudphotos.provider.rackspace.Setup();
+        Boolean hasRackspace = config.getBoolean(setup.PREFS_KEY_HAS_ACCOUNT, false);
+        if (hasRackspace == true) {
+            String authToken = config.getString(setup.PREFS_AUTH_TOKEN, "");
+            String storageUrl = config.getString(setup.PREFS_URL_STORAGE, "");
+            String containerName = config.getString(setup.PREFS_CONTAINER_NAME, "");
+            String url = storageUrl + "/" + URLEncoder.encode(containerName) + "/" + URLEncoder.encode(fileName);
+            AsyncHttpClient client = clientFactory.getAuthenticatedStorageClient(authToken);
+            Log.v("CloudPhotos", "Uploading");
+
+            String mime_type = getMimeTypeFromFilePath(file.getPath());
+
+            FileEntity entity = new FileEntity(file, mime_type);
+            client.put(getApplicationContext(), url, entity, mime_type, new AsyncHttpResponseHandler() {
+                private Boolean completed = false;
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String content) {
+                    completed = true;
+                    if (statusCode == 201) {
+                        Log.v("CloudPhotos", "Rackspace Upload Completed");
+                    } else {
+                        errorCalling();
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable error, String content) {
+                    completed = true;
+                    errorCalling();
+                }
+
+                private void errorCalling() {
+                    Log.v("CloudPhotos", "Rackspace Error Uploading");
+                }
+
+                @Override
+                public void onFinish() {
+                    if (completed == false) {
+                        errorCalling();
+                    }
+                }
+            });
+
+        }
+    }
+
+    /**
+     * Retrieve the mime type for a file.
+     * 
+     * @param url
+     * @return
+     */
+    private String getMimeTypeFromFilePath(String url) {
+        MimeTypeMap map = MimeTypeMap.getSingleton();
+        String ext = MimeTypeMap.getFileExtensionFromUrl(url);
+        String mime_type = map.getMimeTypeFromExtension(ext);
+        return mime_type;
     }
 }
