@@ -1,5 +1,6 @@
 package com.cloud.cloudphotos.provider.rackspace;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,13 +10,17 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,6 +41,7 @@ public class RackspaceChooseContainer extends Activity {
     ListView list;
     ProgressDialog dialog;
     AlertDialog builderFinal;
+    final Context activityContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +109,12 @@ public class RackspaceChooseContainer extends Activity {
         try {
             JSONArray array = new JSONArray(content);
             Integer countContainers = array.length();
+            HashMap<String, String> mapNew = new HashMap<String, String>();
+            mapNew.put("name", "Add New Container");
+            mapNew.put("count", "");
+            mapNew.put("bytes", "");
+            mapNew.put("type", "add");
+            containerList.add(mapNew);
             for (Integer i = 0; i < countContainers; i++) {
                 HashMap<String, String> map = new HashMap<String, String>();
                 JSONObject container = array.getJSONObject(i);
@@ -112,6 +124,7 @@ public class RackspaceChooseContainer extends Activity {
                 map.put("name", name);
                 map.put("count", String.valueOf(count));
                 map.put("bytes", String.valueOf(bytes));
+                map.put("type", "container");
                 containerList.add(map);
             }
         } catch (Exception e) {
@@ -127,12 +140,90 @@ public class RackspaceChooseContainer extends Activity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView containerName = (TextView) view.findViewById(R.id.name);
-                Log.v("CloudPhotos", "Selected : " + containerName.getText().toString());
-                confirmContainerSelection(containerName.getText().toString());
+                TextView listViewType = (TextView) view.findViewById(R.id.typeVal);
+                if (listViewType.getText().toString().equals("add")) {
+                    promptCreateContainer();
+                } else {
+                    TextView containerName = (TextView) view.findViewById(R.id.name);
+                    Log.v("CloudPhotos", "Selected : " + containerName.getText().toString());
+                    confirmContainerSelection(containerName.getText().toString());
+                }
             }
         });
         dialog.dismiss();
+    }
+
+    public void promptCreateContainer() {
+        final Dialog newDialog = new Dialog(activityContext);
+        newDialog.setTitle("New Container");
+        newDialog.setContentView(R.layout.provider_rackspace_setup_new_container);
+        final TextView text = (TextView) newDialog.findViewById(R.id.containerName);
+        final TextView errorText = (TextView) newDialog.findViewById(R.id.error_text);
+
+        Button save = (Button) newDialog.findViewById(R.id.save);
+        Button cancel = (Button) newDialog.findViewById(R.id.cancel);
+        cancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newDialog.dismiss();
+            }
+        });
+        save.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String containerName = text.getText().toString();
+                if (containerName.isEmpty()) {
+                    errorText.setVisibility(View.VISIBLE);
+                } else {
+                    // errorText.setVisibility(View.GONE);
+                    createContainer(containerName, newDialog);
+                }
+            }
+        });
+
+        newDialog.show();
+    }
+
+    private void createContainer(final String containerName, final Dialog newDialog) {
+        newDialog.hide();
+        RackspaceHttpClient clientFactory = new RackspaceHttpClient();
+        AsyncHttpClient client = clientFactory.getAuthenticatedStorageClient(token);
+        @SuppressWarnings("deprecation")
+        String createUrl = storageUrl + "/" + URLEncoder.encode(containerName);
+        client.put(createUrl, new AsyncHttpResponseHandler() {
+            private Boolean completed = false;
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String content) {
+                completed = true;
+                if (statusCode == 201) {
+                    newDialog.dismiss();
+                    Log.v("CloudPhotos", "Container Created - Refresh");
+                    confirmContainerSelection(containerName);
+                } else {
+                    errorCalling();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable error, String content) {
+                completed = true;
+                errorCalling();
+            }
+
+            private void errorCalling() {
+                newDialog.show();
+                TextView errorText = (TextView) newDialog.findViewById(R.id.error_text);
+                errorText.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFinish() {
+                if (completed == false) {
+                    errorCalling();
+                }
+            }
+        });
     }
 
     private void confirmContainerSelection(final String name) {

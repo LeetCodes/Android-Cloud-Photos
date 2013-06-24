@@ -42,23 +42,28 @@ public class ContainerListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View vi = convertView;
-        if (convertView == null)
-            vi = inflater.inflate(R.layout.provider_rackspace_choose_container_item, null);
-
-        TextView name = (TextView) vi.findViewById(R.id.name);
-        TextView count = (TextView) vi.findViewById(R.id.count);
 
         HashMap<String, String> container = new HashMap<String, String>();
         container = data.get(position);
-
-        name.setText(container.get("name"));
         String ocount = container.get("count");
         String o = " objects";
         if (ocount.equals("1")) {
             o = " object";
         }
-        count.setText(container.get("count") + o);
+
+        View vi = convertView;
+        if (container.get("type").equals("add")) {
+            vi = inflater.inflate(R.layout.provider_rackspace_choose_container_new, null);
+        } else {
+            vi = inflater.inflate(R.layout.provider_rackspace_choose_container_item, null);
+            TextView count = (TextView) vi.findViewById(R.id.count);
+            count.setText(container.get("count") + o);
+        }
+
+        TextView name = (TextView) vi.findViewById(R.id.name);
+        TextView type = (TextView) vi.findViewById(R.id.typeVal);
+        type.setText(container.get("type"));
+        name.setText(container.get("name"));
         return vi;
     }
 }
