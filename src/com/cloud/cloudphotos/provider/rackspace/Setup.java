@@ -5,6 +5,12 @@ import android.util.Log;
 public class Setup {
 
     public static final String PREFS_KEY_HAS_ACCOUNT = "has_provider_rackspace";
+    public static final String PREFS_USER_USERNAME = "auth_rackspace_username";
+    public static final String PREFS_USER_APIKEY = "auth_rackspace_apikey";
+    public static final String PREFS_AUTH_TOKEN = "auth_rackspace_token";
+    public static final String PREFS_URL_ENDPOINT = "auth_rackspace_url_auth";
+    public static final String PREFS_URL_STORAGE = "auth_rackspace_url_storage";
+    public static final String PREFS_CONTAINER_NAME = "auth_rackspace_container_name";
 
     public Setup() {
 

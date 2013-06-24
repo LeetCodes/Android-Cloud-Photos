@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.cloud.cloudphotos.ApplicationConfig;
 import com.cloud.cloudphotos.R;
@@ -30,21 +31,25 @@ public class RackspaceChooseContainer extends Activity {
     String username;
     String apikey;
     String token;
+    String endpoint;
     String storageUrl;
     ListView list;
     ProgressDialog dialog;
+    AlertDialog builderFinal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.provider_rackspace_choose_container);
         Bundle extras = getIntent().getExtras();
+        config = new ApplicationConfig(getApplicationContext());
         if (extras != null) {
             username = extras.getString("username");
             apikey = extras.getString("apikey");
             token = extras.getString("token");
+            endpoint = extras.getString("endpoint");
             storageUrl = extras.getString("storageUrl");
-            if (username.isEmpty() || apikey.isEmpty() || token.isEmpty() || storageUrl.isEmpty()) {
+            if (username.isEmpty() || apikey.isEmpty() || token.isEmpty() || storageUrl.isEmpty() || endpoint.isEmpty()) {
                 back();
             } else {
                 dialog = new ProgressDialog(this);
@@ -115,7 +120,6 @@ public class RackspaceChooseContainer extends Activity {
             Log.v("CloudPhotos", e.getStackTrace().toString());
             errorRetrieving();
         }
-
         ContainerListAdapter adapter = new ContainerListAdapter(this, containerList);
         list = (ListView) findViewById(R.id.list);
         list.setAdapter(adapter);
@@ -123,11 +127,49 @@ public class RackspaceChooseContainer extends Activity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO Auto-generated method stub
-
+                TextView containerName = (TextView) view.findViewById(R.id.name);
+                Log.v("CloudPhotos", "Selected : " + containerName.getText().toString());
+                confirmContainerSelection(containerName.getText().toString());
             }
         });
         dialog.dismiss();
+    }
+
+    private void confirmContainerSelection(final String name) {
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Container Selection");
+        alert.setMessage("Are you sure you want to use the following container for uploads?\n\n" + name);
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                config.setString(Setup.PREFS_USER_USERNAME, username);
+                config.setString(Setup.PREFS_USER_APIKEY, apikey);
+                config.setString(Setup.PREFS_AUTH_TOKEN, token);
+                config.setString(Setup.PREFS_URL_ENDPOINT, endpoint);
+                config.setString(Setup.PREFS_URL_STORAGE, storageUrl);
+                config.setString(Setup.PREFS_CONTAINER_NAME, name);
+                config.setBoolean(Setup.PREFS_KEY_HAS_ACCOUNT, true);
+                confirmSaved();
+            }
+        });
+        alert.setNegativeButton("Cancel", null);
+        alert.setCancelable(false);
+        alert.show();
+    }
+
+    private void confirmSaved() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Settings Saved");
+        alert.setMessage("Your settings have been saved.");
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                back();
+            }
+        });
+        alert.setCancelable(false);
+        alert.show();
     }
 
     private void errorRetrieving() {
@@ -148,5 +190,4 @@ public class RackspaceChooseContainer extends Activity {
     private void back() {
         this.finish();
     }
-
 }

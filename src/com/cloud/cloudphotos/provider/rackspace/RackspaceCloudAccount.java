@@ -117,6 +117,7 @@ public class RackspaceCloudAccount {
             intent.putExtra("apikey", apikey);
             intent.putExtra("token", token);
             intent.putExtra("storageUrl", storageUrl);
+            intent.putExtra("endpoint", authUrl);
             activityContext.startActivity(intent);
             activityContext.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
         }

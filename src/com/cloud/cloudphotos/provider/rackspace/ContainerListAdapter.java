@@ -55,7 +55,7 @@ public class ContainerListAdapter extends BaseAdapter {
         name.setText(container.get("name"));
         String ocount = container.get("count");
         String o = " objects";
-        if (ocount == "1") {
+        if (ocount.equals("1")) {
             o = " object";
         }
         count.setText(container.get("count") + o);

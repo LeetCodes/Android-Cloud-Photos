@@ -32,5 +32,16 @@
             android:textColor="#fff"
             android:text="Rackspace Cloud Files" />
 
+        <Button
+            android:id="@+id/clear_all"
+            android:layout_below="@+id/rackspace"
+            android:layout_marginTop="40dip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/btn_danger"
+            android:textColor="#fff"
+            android:text="Clear All Settings" />
+
     </RelativeLayout>
 </LinearLayout>
