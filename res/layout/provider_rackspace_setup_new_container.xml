@@ -18,49 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="@string/rackspace_enter_credentials" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF" >
-
-        <TextView
-            android:id="@+id/already_has"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="15dp"
-            android:gravity="center_horizontal"
-            android:text="@string/rackspace_existing_account"
-            android:textColor="#FF0000"
-            android:visibility="gone" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF" >
-
-        <ScrollView
-            android:id="@+id/scroll01"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="15dp" >
-
-            <TextView
-                android:id="@+id/authentication_failed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="@string/rackspace_authentication_failed"
-                android:textColor="#FF0000"
-                android:visibility="gone" />
-        </ScrollView>
+            android:text="@string/enter_container_name" />
     </LinearLayout>
 
     <LinearLayout
@@ -69,53 +27,18 @@
         android:background="#FFFFFF" >
 
         <EditText
-            android:id="@+id/username"
+            android:id="@+id/containerName"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="@string/username"
+            android:hint="@string/container_name_hint"
             android:imeOptions="actionNext"
             android:singleLine="true" >
 
             <requestFocus />
         </EditText>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF" >
-
-        <EditText
-            android:id="@+id/api_key"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1"
-            android:ems="10"
-            android:hint="@string/apikey"
-            android:imeOptions="actionNext"
-            android:nextFocusDown="@+id/endpoint"
-            android:singleLine="true" >
-        </EditText>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF" >
-
-        <Spinner
-            android:id="@+id/endpoint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:entries="@array/rackspace_endpoints"
-            android:prompt="@string/rackspace_endpoint_prompt" />
     </LinearLayout>
 
     <LinearLayout
@@ -130,7 +53,7 @@
             android:layout_gravity="left"
             android:layout_marginTop="15dp"
             android:gravity="center_horizontal"
-            android:text="@string/complete_fields_try_again"
+            android:text="@string/rackspace_create_container_error_try_again"
             android:textColor="#FF0000"
             android:visibility="gone" />
     </LinearLayout>

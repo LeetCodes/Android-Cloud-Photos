@@ -1,7 +1,5 @@
 package com.cloud.cloudphotos.provider.rackspace;
 
-import java.security.KeyStore;
-
 import org.apache.http.Header;
 
 import android.app.AlertDialog;
@@ -18,9 +16,7 @@ import android.widget.TextView;
 
 import com.cloud.cloudphotos.ApplicationConfig;
 import com.cloud.cloudphotos.CloudAccounts;
-import com.cloud.cloudphotos.CloudPhotos;
 import com.cloud.cloudphotos.R;
-import com.cloud.cloudphotos.helper.SslFactory;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -83,6 +79,7 @@ public class RackspaceCloudAccount {
                 String akey = apikey.getText().toString();
                 String epoint = endpoint.getItemAtPosition(endpoint.getSelectedItemPosition()).toString();
                 if (setup.areValidCredentials(uname, akey, epoint)) {
+                    dialoglayout.setVisibility(View.INVISIBLE);
                     String url = Setup.getAuthenticationEndpointFromString(epoint);
                     validateRackspace(uname, akey, url);
                 } else {
@@ -115,13 +112,14 @@ public class RackspaceCloudAccount {
             authenticationFailed();
         } else {
             builderFinal.cancel();
-            Intent intent = new Intent(activityContext, CloudPhotos.class);
+            Intent intent = new Intent(activityContext, RackspaceChooseContainer.class);
+            intent.putExtra("username", username);
+            intent.putExtra("apikey", apikey);
+            intent.putExtra("token", token);
+            intent.putExtra("storageUrl", storageUrl);
+            intent.putExtra("endpoint", authUrl);
             activityContext.startActivity(intent);
             activityContext.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
-            Log.v("CloudPhotos", username);
-            Log.v("CloudPhotos", apikey);
-            Log.v("CloudPhotos", token);
-            Log.v("CloudPhotos", storageUrl);
         }
     }
 
@@ -129,6 +127,7 @@ public class RackspaceCloudAccount {
      * Authentication failed, notify the user.
      */
     public void authenticationFailed() {
+        dialoglayout.setVisibility(View.VISIBLE);
         Log.v("CloudPhotos", "Authentication failed");
         TextView tv = (TextView) dialoglayout.findViewById(R.id.authentication_failed);
         tv.setVisibility(View.VISIBLE);
@@ -142,18 +141,8 @@ public class RackspaceCloudAccount {
      * @param url
      */
     private void validateRackspace(final String username, final String apikey, final String url) {
-        AsyncHttpClient client = new AsyncHttpClient();
-        try {
-            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            trustStore.load(null, null);
-            SslFactory sf = new SslFactory(trustStore);
-            sf.setHostnameVerifier(SslFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            client.setSSLSocketFactory(sf);
-        } catch (Exception e) {
-
-        }
-        client.addHeader("X-Auth-User", username);
-        client.addHeader("X-Auth-Key", apikey);
+        RackspaceHttpClient httpClient = new RackspaceHttpClient();
+        AsyncHttpClient client = httpClient.getAuthenticationClient(username, apikey);
         client.get(url, new AsyncHttpResponseHandler() {
             private Boolean completed = false;
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/list_selector_green"
+    android:orientation="horizontal"
+    android:paddingBottom="15dip"
+    android:paddingLeft="15dip"
+    android:paddingRight="5dip" >
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="40dip"
+        android:text="Container Name"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="15dip"
+        android:layout_marginBottom="10dip"
+        android:textSize="15dip"
+        android:textStyle="bold"
+        android:typeface="sans" />
+ 
+    <TextView
+        android:id="@+id/count"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name"
+        android:textColor="#FFFFFF"
+        android:textSize="10dip"
+        android:layout_marginTop="1dip"
+        android:text="Create a new container for your uploads" />
+ 
+     <ImageView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/plus"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"/>
+
+     <EditText
+         android:id="@+id/typeVal"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:visibility="gone"
+         android:ems="10" >
+     </EditText>
+ 
+</RelativeLayout>
