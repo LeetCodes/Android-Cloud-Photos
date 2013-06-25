@@ -1,23 +1,38 @@
 Android Cloud Photos
 ====================
 
-#### IN DEVELOPMENT
+#### IN BETA VERSION
 
 ## What this is
 
 This is An Android application to sync photos to a variety of online cloud services.
 
+It's built to handle multiple providers, but I'm probably only going to use Rackspace Cloud Files with it.
+
 ## What's working?
 
-Currently, Rackspace Cloud Files (UK LON Accounts) work. You can log in, select a container (or create a container) and your photos will automatically be uploaded.
+Everything so far!
+
+You can use US and UK Rackspace accounts.
+
+You can log in
+
+You can see your container list
+
+You can create a container
+
+Authentication Tokens are cached
+
+## What needs doing?
+
+UI! Please help out. I'm absolutely pants at making things look good.
+
 
 ## What's broken?
 
-Plenty.
+I don't think anything is actually broken, but there is an edge case...
 
-A simple queuing service still needs to be implemented, more than likely in SQLite. This needs to store the file paths and run uploads one at a time, until the queue is cleared.
-
-The queue needs to be controlled by different network states. So a user can choose to upload their photos on Mobile data or WiFi only.
+If you delete your container, the application will not recognise this. It'll keep reauthenticating with the service. This is a minor bug, but still, it is a bug.
 
 ### Honorable Mentions
 
