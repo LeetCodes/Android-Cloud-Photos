@@ -2,6 +2,7 @@ package com.cloud.cloudphotos;
 
 import java.io.File;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.http.Header;
@@ -14,13 +15,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import com.cloud.cloudphotos.data.Photo;
+import com.cloud.cloudphotos.data.PhotoDatasource;
 import com.cloud.cloudphotos.provider.rackspace.RackspaceHttpClient;
-import com.cloud.cloudphotos.provider.rackspace.Setup;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -28,6 +32,10 @@ public class BackgroundService extends Service {
 
     static boolean isRunning = false;
     private ApplicationConfig config;
+    private Boolean uploaderRunning = false;
+    PhotoDatasource datasource;
+    Context activityContext = this;
+    Integer numberUploaded = 0;
 
     private final String TAG = "CloudPhotos";
 
@@ -45,26 +53,80 @@ public class BackgroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && intent.getAction() != null && intent.getAction().endsWith("NEW_PICTURE")) {
+        if (intent != null && intent.getAction() != null) {
             config = new ApplicationConfig(this.getApplicationContext());
-            try {
-                notifyStarted();
+
+            if (intent.getAction().endsWith("NEW_PICTURE")) {
                 Uri uri = intent.getData();
                 String filePath = getPathFromUri(uri);
                 File photo = new File(filePath);
-                String fileName = photo.getName();
-                runProviders(photo, fileName);
+                storePhoto(photo, filePath);
                 Log.v(TAG, "CloudPhotos photo detected.");
                 Log.v(TAG, "CloudPhotos file path:");
                 Log.v(TAG, filePath);
-            } catch (Exception e) {
-                Log.v(TAG, "CloudPhotos: Error receiving photo.");
             }
         } else {
             Log.v(TAG, "CloudPhotos service created");
         }
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    public void storePhoto(File photo, String filePath) {
+        PhotoDatasource datasource = new PhotoDatasource(this);
+        datasource.open();
+        String datestamp = getDatestamp();
+        Photo added = datasource.createPhoto(filePath, datestamp);
+        Log.v("CloudPhotos", "Added photo id " + added.getId());
+        evaluateCanRun();
+    }
+
+    private void notifyNumberUploaded(Integer num) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle("CloudPhotos - Uploads").setContentText("Your photos have been uploaded.")
+                .setNumber(num);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Integer mId = 1;
+        mNotificationManager.notify(1, mBuilder.build());
+    }
+
+    private void evaluateCanRun() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                datasource = new PhotoDatasource(activityContext);
+                datasource.open();
+                List<Photo> photos = datasource.getAllPhotos();
+                if (photos.isEmpty() && numberUploaded != 0) {
+                    notifyNumberUploaded(numberUploaded);
+                }
+                for (Photo photo : photos) {
+                    try {
+                        File file = new File(photo.getPath());
+                        String name = file.getName();
+                        if (file.exists()) {
+                            uploadPhoto(file, name, photo);
+                        } else {
+                            datasource.deletePhotoModel(photo);
+                        }
+                        break;
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+        }, 2000);
+
+    }
+
+    public void uploadPhoto(File photo, String fileName, Photo model) {
+        try {
+            notifyStarted();
+            runProviders(photo, fileName, model);
+        } catch (Exception e) {
+            Log.v(TAG, "CloudPhotos: Error processing providers for photo: " + model.getId());
+        }
     }
 
     @Override
@@ -75,7 +137,6 @@ public class BackgroundService extends Service {
     }
 
     private void notifyStarted() {
-        Log.v(TAG, "CloudPhotos Processing...");
         Integer nId = (new Random()).nextInt(100) + 1;
         Notification.Builder nBuilder = new Notification.Builder(this).setSmallIcon(R.drawable.ic_launcher)
                 .setAutoCancel(true).setTicker("CloudPhotos Processing...");
@@ -102,25 +163,51 @@ public class BackgroundService extends Service {
         }
     }
 
-    private void runProviders(File file, String fileName) {
+    /**
+     * Run the individual providers.
+     * 
+     * @param file
+     * @param fileName
+     * @param model
+     */
+    private void runProviders(File file, String fileName, Photo model) {
         try {
-            runRackspace(file, fileName);
+            runRackspace(file, fileName, model);
         } catch (Exception e) {
         }
     }
 
-    private void runRackspace(File file, String fileName) {
-        Log.v("CloudPhotos", "Running Rackspace Upload");
+    /**
+     * Runs a singular upload to Rackspace
+     * 
+     * @param file
+     * @param fileName
+     * @param model
+     */
+    private void runRackspace(File file, String fileName, final Photo model) {
+        if (uploaderRunning == true) {
+            return;
+        }
+        uploaderRunning = true;
+        Log.v("CloudPhotos", "Rackspace Upload Starting");
         RackspaceHttpClient clientFactory = new RackspaceHttpClient();
-        Setup setup = new com.cloud.cloudphotos.provider.rackspace.Setup();
-        Boolean hasRackspace = config.getBoolean(setup.PREFS_KEY_HAS_ACCOUNT, false);
+        Boolean hasRackspace = config.getBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT,
+                false);
         if (hasRackspace == true) {
-            String authToken = config.getString(setup.PREFS_AUTH_TOKEN, "");
-            String storageUrl = config.getString(setup.PREFS_URL_STORAGE, "");
-            String containerName = config.getString(setup.PREFS_CONTAINER_NAME, "");
+            final String authUrl = config.getString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_ENDPOINT,
+                    "");
+            final String userName = config.getString(
+                    com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_USERNAME, "");
+            final String apiKey = config
+                    .getString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_APIKEY, "");
+            final String authToken = config.getString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_AUTH_TOKEN,
+                    "");
+            final String storageUrl = config.getString(
+                    com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_STORAGE, "");
+            final String containerName = config.getString(
+                    com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_CONTAINER_NAME, "");
             String url = storageUrl + "/" + URLEncoder.encode(containerName) + "/" + URLEncoder.encode(fileName);
             AsyncHttpClient client = clientFactory.getAuthenticatedStorageClient(authToken);
-            Log.v("CloudPhotos", "Uploading");
 
             String mime_type = getMimeTypeFromFilePath(file.getPath());
 
@@ -132,7 +219,12 @@ public class BackgroundService extends Service {
                 public void onSuccess(int statusCode, Header[] headers, String content) {
                     completed = true;
                     if (statusCode == 201) {
+                        uploaderRunning = false;
+                        numberUploaded++;
+                        notifyNumberUploaded(numberUploaded);
+                        datasource.deletePhotoModel(model);
                         Log.v("CloudPhotos", "Rackspace Upload Completed");
+                        evaluateCanRun();
                     } else {
                         errorCalling();
                     }
@@ -145,7 +237,9 @@ public class BackgroundService extends Service {
                 }
 
                 private void errorCalling() {
-                    Log.v("CloudPhotos", "Rackspace Error Uploading");
+                    uploaderRunning = false;
+                    Log.v("CloudPhotos", "Rackspace Upload Error - Reauthenticating");
+                    reauthenticateRackspace(userName, apiKey, authUrl);
                 }
 
                 @Override
@@ -156,6 +250,84 @@ public class BackgroundService extends Service {
                 }
             });
 
+        }
+    }
+
+    private void reauthenticateRackspace(final String username, final String apikey, final String url) {
+        RackspaceHttpClient httpClient = new RackspaceHttpClient();
+        AsyncHttpClient client = httpClient.getAuthenticationClient(username, apikey);
+        client.get(url, new AsyncHttpResponseHandler() {
+            private Boolean completed = false;
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String content) {
+                completed = true;
+                if (statusCode == 204) {
+                    rackspaceAuthenticationSuccess(headers, username, apikey, url);
+                } else {
+                    rackspaceAuthenticationFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable error, String content) {
+                completed = true;
+                rackspaceAuthenticationFailed();
+            }
+
+            @Override
+            public void onFinish() {
+                if (completed == false) {
+                    rackspaceAuthenticationFailed();
+                }
+            }
+        });
+    }
+
+    public void rackspaceAuthenticationFailed() {
+        Log.v("CloudPhotos", "Rackspace Reauthenticaiton failed.");
+        clearRackspaceValues();
+    }
+
+    private void clearRackspaceValues() {
+        config.setBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT, false);
+        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_AUTH_TOKEN);
+        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_ENDPOINT);
+        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_STORAGE);
+        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_APIKEY);
+        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_USERNAME);
+    }
+
+    /**
+     * Authentication was a success, evaluate the headers and if valid, store
+     * the values.
+     * 
+     * @param headers
+     * @param username
+     * @param apikey
+     * @param authUrl
+     */
+    public void rackspaceAuthenticationSuccess(Header[] headers, String username, String apikey, String authUrl) {
+        clearRackspaceValues();
+        String token = "";
+        String storageUrl = "";
+        for (Header header : headers) {
+            if (header.getName().equalsIgnoreCase("X-Auth-Token")) {
+                token = header.getValue();
+            } else if (header.getName().equalsIgnoreCase("X-Storage-Url")) {
+                storageUrl = header.getValue();
+            }
+        }
+        if (token.isEmpty() || storageUrl.isEmpty()) {
+            rackspaceAuthenticationFailed();
+        } else {
+            config.setBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT, true);
+            config.setString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_AUTH_TOKEN, token);
+            config.setString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_ENDPOINT, authUrl);
+            config.setString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_STORAGE, storageUrl);
+            config.setString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_APIKEY, apikey);
+            config.setString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_USERNAME, username);
+            evaluateCanRun();
         }
     }
 
@@ -170,5 +342,9 @@ public class BackgroundService extends Service {
         String ext = MimeTypeMap.getFileExtensionFromUrl(url);
         String mime_type = map.getMimeTypeFromExtension(ext);
         return mime_type;
+    }
+
+    private String getDatestamp() {
+        return String.valueOf(System.currentTimeMillis());
     }
 }
