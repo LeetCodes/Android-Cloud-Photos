@@ -24,6 +24,7 @@ import android.webkit.MimeTypeMap;
 
 import com.cloud.cloudphotos.data.Photo;
 import com.cloud.cloudphotos.data.PhotoDatasource;
+import com.cloud.cloudphotos.helper.NetworkConnection;
 import com.cloud.cloudphotos.provider.rackspace.RackspaceHttpClient;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -48,7 +49,7 @@ public class BackgroundService extends Service {
     public void onCreate() {
         super.onCreate();
         isRunning = true;
-        Log.v(TAG, "CloudPhotos service created");
+        Log.i(TAG, "CloudPhotos service created");
     }
 
     @Override
@@ -61,12 +62,21 @@ public class BackgroundService extends Service {
                 String filePath = getPathFromUri(uri);
                 File photo = new File(filePath);
                 storePhoto(photo, filePath);
-                Log.v(TAG, "CloudPhotos photo detected.");
-                Log.v(TAG, "CloudPhotos file path:");
-                Log.v(TAG, filePath);
+                Log.i(TAG, "CloudPhotos photo detected.");
+                Log.i(TAG, "CloudPhotos file path:");
+                Log.i(TAG, filePath);
+            } else if (intent.getAction().equals("android.net.wifi.STATE_CHANGE")) {
+                // Wifi state has changed to connected.
+                evaluateCanRun();
+            } else if (intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+                // Wifi has been disconnected.
+                evaluateCanRun();
+            } else if (intent.getAction().equals("android.net.wifi.supplicant.CONNECTION_CHANGE")) {
+                // Connection change.
+                evaluateCanRun();
             }
         } else {
-            Log.v(TAG, "CloudPhotos service created");
+            Log.i(TAG, "CloudPhotos service created");
         }
 
         return super.onStartCommand(intent, flags, startId);
@@ -77,11 +87,14 @@ public class BackgroundService extends Service {
         datasource.open();
         String datestamp = getDatestamp();
         Photo added = datasource.createPhoto(filePath, datestamp);
-        Log.v("CloudPhotos", "Added photo id " + added.getId());
+        Log.i("CloudPhotos", "Added photo id " + added.getId());
         evaluateCanRun();
     }
 
     private void notifyNumberUploaded(Integer num) {
+        if (num.equals(0)) {
+            return;
+        }
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("CloudPhotos - Uploads").setContentText("Your photos have been uploaded.")
                 .setNumber(num);
@@ -91,6 +104,20 @@ public class BackgroundService extends Service {
     }
 
     private void evaluateCanRun() {
+        Boolean wifiOnly = config.getBoolean("wifionly", true);
+        if (wifiOnly) {
+            // check if connected to wifi.
+            Boolean isWifiConnected = NetworkConnection.isWiFiNetworkConnectionAvailable(activityContext);
+            if (!isWifiConnected) {
+                return; // Dont proceed, as it's wifi only.
+            }
+        } else {
+            Boolean hasAvailableConnection = NetworkConnection.isNetworkConnectionAvailable(activityContext);
+            if (!hasAvailableConnection) {
+                return; // Dont proceed, as there's no network connection
+                        // available.
+            }
+        }
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -98,9 +125,6 @@ public class BackgroundService extends Service {
                 datasource = new PhotoDatasource(activityContext);
                 datasource.open();
                 List<Photo> photos = datasource.getAllPhotos();
-                if (photos.isEmpty() && numberUploaded != 0) {
-                    notifyNumberUploaded(numberUploaded);
-                }
                 for (Photo photo : photos) {
                     try {
                         File file = new File(photo.getPath());
@@ -125,14 +149,14 @@ public class BackgroundService extends Service {
             notifyStarted();
             runProviders(photo, fileName, model);
         } catch (Exception e) {
-            Log.v(TAG, "CloudPhotos: Error processing providers for photo: " + model.getId());
+            Log.i(TAG, "CloudPhotos: Error processing providers for photo: " + model.getId());
         }
     }
 
     @Override
     public void onDestroy() {
         isRunning = false;
-        Log.v(TAG, "CloudPhotos destroyed");
+        Log.i(TAG, "CloudPhotos destroyed");
         super.onDestroy();
     }
 
@@ -189,7 +213,7 @@ public class BackgroundService extends Service {
             return;
         }
         uploaderRunning = true;
-        Log.v("CloudPhotos", "Rackspace Upload Starting");
+        Log.i("CloudPhotos", "Rackspace Upload Starting");
         RackspaceHttpClient clientFactory = new RackspaceHttpClient();
         Boolean hasRackspace = config.getBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT,
                 false);
@@ -223,7 +247,7 @@ public class BackgroundService extends Service {
                         numberUploaded++;
                         notifyNumberUploaded(numberUploaded);
                         datasource.deletePhotoModel(model);
-                        Log.v("CloudPhotos", "Rackspace Upload Completed");
+                        Log.i("CloudPhotos", "Rackspace Upload Completed");
                         evaluateCanRun();
                     } else {
                         errorCalling();
@@ -238,7 +262,7 @@ public class BackgroundService extends Service {
 
                 private void errorCalling() {
                     uploaderRunning = false;
-                    Log.v("CloudPhotos", "Rackspace Upload Error - Reauthenticating");
+                    Log.i("CloudPhotos", "Rackspace Upload Error - Reauthenticating");
                     reauthenticateRackspace(userName, apiKey, authUrl);
                 }
 
@@ -285,17 +309,13 @@ public class BackgroundService extends Service {
     }
 
     public void rackspaceAuthenticationFailed() {
-        Log.v("CloudPhotos", "Rackspace Reauthenticaiton failed.");
+        Log.i("CloudPhotos", "Rackspace Reauthentication failed.");
         clearRackspaceValues();
     }
 
     private void clearRackspaceValues() {
-        config.setBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT, false);
+        config = new ApplicationConfig(this.getApplicationContext());
         config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_AUTH_TOKEN);
-        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_ENDPOINT);
-        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_STORAGE);
-        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_APIKEY);
-        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_USERNAME);
     }
 
     /**
@@ -321,6 +341,7 @@ public class BackgroundService extends Service {
         if (token.isEmpty() || storageUrl.isEmpty()) {
             rackspaceAuthenticationFailed();
         } else {
+            config = new ApplicationConfig(this.getApplicationContext());
             config.setBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT, true);
             config.setString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_AUTH_TOKEN, token);
             config.setString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_ENDPOINT, authUrl);

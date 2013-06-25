@@ -106,7 +106,6 @@ public class RackspaceChooseContainer extends Activity {
     }
 
     private void processResult(String content) {
-        // Log.v("CloudPhotos", content);
         ArrayList<HashMap<String, String>> containerList = new ArrayList<HashMap<String, String>>();
         try {
             JSONArray array = new JSONArray(content);
@@ -124,9 +123,9 @@ public class RackspaceChooseContainer extends Activity {
                 containerList.add(map);
             }
         } catch (Exception e) {
-            Log.v("CloudPhotos", "Exception");
-            Log.v("CloudPhotos", e.getMessage());
-            Log.v("CloudPhotos", e.getStackTrace().toString());
+            Log.i("CloudPhotos", "Exception");
+            Log.i("CloudPhotos", e.getMessage());
+            Log.i("CloudPhotos", e.getStackTrace().toString());
             errorRetrieving();
         }
         Collections.sort(containerList, new ArrayListHashMapSort("name"));
@@ -149,7 +148,7 @@ public class RackspaceChooseContainer extends Activity {
                     promptCreateContainer();
                 } else {
                     TextView containerName = (TextView) view.findViewById(R.id.name);
-                    Log.v("CloudPhotos", "Selected : " + containerName.getText().toString());
+                    Log.i("CloudPhotos", "Selected : " + containerName.getText().toString());
                     confirmContainerSelection(containerName.getText().toString());
                 }
             }
@@ -202,7 +201,7 @@ public class RackspaceChooseContainer extends Activity {
                 completed = true;
                 if (statusCode == 201) {
                     newDialog.dismiss();
-                    Log.v("CloudPhotos", "Container Created - Refresh");
+                    Log.i("CloudPhotos", "Container Created - Refresh");
                     confirmContainerSelection(containerName);
                 } else {
                     errorCalling();

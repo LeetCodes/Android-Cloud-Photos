@@ -11,6 +11,7 @@
     <string name="settings">Settings</string>
     <string-array name="rackspace_endpoints">
         <item>United Kingdom (LON)</item>
+        <item>United States (ORD/DFW)</item>
     </string-array>
     <string name="rackspace_endpoint_prompt">Select Account Location</string>
     <string name="rackspace_enter_credentials">Please enter your credentials to access Rackspace Cloud Files below.</string>

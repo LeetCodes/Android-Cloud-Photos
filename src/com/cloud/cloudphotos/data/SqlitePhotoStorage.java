@@ -30,7 +30,7 @@ public class SqlitePhotoStorage extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
-        Log.w(SqlitePhotoStorage.class.getName(), "Database Upgrade " + oldV + " to " + newV
+        Log.i(SqlitePhotoStorage.class.getName(), "Database Upgrade " + oldV + " to " + newV
                 + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PHOTOS);
         onCreate(db);

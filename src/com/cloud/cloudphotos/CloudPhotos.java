@@ -26,9 +26,14 @@ public class CloudPhotos extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.action_settings:
+        case R.id.action_accounts:
             Intent intent = new Intent(this, CloudAccounts.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
+            return true;
+        case R.id.action_settings:
+            Intent settings = new Intent(this, ApplicationSettings.class);
+            startActivity(settings);
             overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
             return true;
         }
