@@ -28,7 +28,8 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.android.camera.NEW_PICTURE" />
                 <action android:name="android.hardware.action.NEW_PICTURE" />
-
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.wifi.STATE_CHANGE"/>
                 <data android:mimeType="image/*" />
             </intent-filter>
         </receiver>
@@ -47,6 +48,12 @@
             android:name="com.cloud.cloudphotos.CloudAccounts"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/accounts" >
+        </activity>
+
+        <activity
+            android:name="com.cloud.cloudphotos.ApplicationSettings"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/settings" >
         </activity>
 
         <activity
