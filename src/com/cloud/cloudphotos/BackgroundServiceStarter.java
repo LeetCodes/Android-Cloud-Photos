@@ -13,7 +13,7 @@ public class BackgroundServiceStarter extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String iName = intent.getAction();
-        Log.v("CloudPhotos", "Intent: " + iName);
+        Log.i("CloudPhotos", "Intent received: " + iName);
         if ("android.intent.action.BOOT_COMPLETED".equals(iName)) {
             Intent i = new Intent(context, BackgroundService.class);
             context.startService(i);
@@ -28,7 +28,7 @@ public class BackgroundServiceStarter extends BroadcastReceiver {
         } else if (iName.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
             if (networkInfo.isConnected()) {
-                Log.v("CloudPhotos", "Wifi connected");
+                Log.i("CloudPhotos", "Wifi connected");
                 Intent i = new Intent(context, BackgroundService.class);
                 i.setData(intent.getData());
                 i.setAction(iName);
@@ -44,7 +44,7 @@ public class BackgroundServiceStarter extends BroadcastReceiver {
             boolean connected = intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false);
             if (connected) {
                 // start your service here
-                Log.v("CloudPhotos", "Wifi connected");
+                Log.i("CloudPhotos", "Wifi connected");
                 Intent i = new Intent(context, BackgroundService.class);
                 i.setData(intent.getData());
                 i.setAction(iName);

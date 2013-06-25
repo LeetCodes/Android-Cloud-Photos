@@ -41,7 +41,7 @@ public class Setup {
      * @return
      */
     public Boolean areValidCredentials(String username, String apikey, String endpoint) {
-        Log.v("CloudPhotos", "Endpoint URL : " + getAuthenticationEndpointFromString(endpoint));
+        Log.i("CloudPhotos", "Endpoint URL : " + getAuthenticationEndpointFromString(endpoint));
         if (username.isEmpty() || apikey.isEmpty() || endpoint.isEmpty()) {
             return false;
         }

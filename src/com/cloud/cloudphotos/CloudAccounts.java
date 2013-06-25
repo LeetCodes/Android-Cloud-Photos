@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.cloud.cloudphotos.provider.rackspace.RackspaceCloudAccount;
-import com.cloud.cloudphotos.provider.rackspace.Setup;
 
 public class CloudAccounts extends Activity {
 
@@ -72,7 +70,6 @@ public class CloudAccounts extends Activity {
 
     @Override
     public void onResume() {
-        Log.v("CloudPhotos", String.valueOf(config.getBoolean(Setup.PREFS_KEY_HAS_ACCOUNT, false)));
         super.onResume();
     }
 

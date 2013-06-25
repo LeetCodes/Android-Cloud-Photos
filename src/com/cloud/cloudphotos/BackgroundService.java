@@ -49,7 +49,7 @@ public class BackgroundService extends Service {
     public void onCreate() {
         super.onCreate();
         isRunning = true;
-        Log.v(TAG, "CloudPhotos service created");
+        Log.i(TAG, "CloudPhotos service created");
     }
 
     @Override
@@ -62,9 +62,9 @@ public class BackgroundService extends Service {
                 String filePath = getPathFromUri(uri);
                 File photo = new File(filePath);
                 storePhoto(photo, filePath);
-                Log.v(TAG, "CloudPhotos photo detected.");
-                Log.v(TAG, "CloudPhotos file path:");
-                Log.v(TAG, filePath);
+                Log.i(TAG, "CloudPhotos photo detected.");
+                Log.i(TAG, "CloudPhotos file path:");
+                Log.i(TAG, filePath);
             } else if (intent.getAction().equals("android.net.wifi.STATE_CHANGE")) {
                 // Wifi state has changed to connected.
                 evaluateCanRun();
@@ -76,7 +76,7 @@ public class BackgroundService extends Service {
                 evaluateCanRun();
             }
         } else {
-            Log.v(TAG, "CloudPhotos service created");
+            Log.i(TAG, "CloudPhotos service created");
         }
 
         return super.onStartCommand(intent, flags, startId);
@@ -87,7 +87,7 @@ public class BackgroundService extends Service {
         datasource.open();
         String datestamp = getDatestamp();
         Photo added = datasource.createPhoto(filePath, datestamp);
-        Log.v("CloudPhotos", "Added photo id " + added.getId());
+        Log.i("CloudPhotos", "Added photo id " + added.getId());
         evaluateCanRun();
     }
 
@@ -149,14 +149,14 @@ public class BackgroundService extends Service {
             notifyStarted();
             runProviders(photo, fileName, model);
         } catch (Exception e) {
-            Log.v(TAG, "CloudPhotos: Error processing providers for photo: " + model.getId());
+            Log.i(TAG, "CloudPhotos: Error processing providers for photo: " + model.getId());
         }
     }
 
     @Override
     public void onDestroy() {
         isRunning = false;
-        Log.v(TAG, "CloudPhotos destroyed");
+        Log.i(TAG, "CloudPhotos destroyed");
         super.onDestroy();
     }
 
@@ -213,7 +213,7 @@ public class BackgroundService extends Service {
             return;
         }
         uploaderRunning = true;
-        Log.v("CloudPhotos", "Rackspace Upload Starting");
+        Log.i("CloudPhotos", "Rackspace Upload Starting");
         RackspaceHttpClient clientFactory = new RackspaceHttpClient();
         Boolean hasRackspace = config.getBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT,
                 false);
@@ -247,7 +247,7 @@ public class BackgroundService extends Service {
                         numberUploaded++;
                         notifyNumberUploaded(numberUploaded);
                         datasource.deletePhotoModel(model);
-                        Log.v("CloudPhotos", "Rackspace Upload Completed");
+                        Log.i("CloudPhotos", "Rackspace Upload Completed");
                         evaluateCanRun();
                     } else {
                         errorCalling();
@@ -262,7 +262,7 @@ public class BackgroundService extends Service {
 
                 private void errorCalling() {
                     uploaderRunning = false;
-                    Log.v("CloudPhotos", "Rackspace Upload Error - Reauthenticating");
+                    Log.i("CloudPhotos", "Rackspace Upload Error - Reauthenticating");
                     reauthenticateRackspace(userName, apiKey, authUrl);
                 }
 
@@ -309,18 +309,13 @@ public class BackgroundService extends Service {
     }
 
     public void rackspaceAuthenticationFailed() {
-        Log.v("CloudPhotos", "Rackspace Reauthentication failed.");
+        Log.i("CloudPhotos", "Rackspace Reauthentication failed.");
         clearRackspaceValues();
     }
 
     private void clearRackspaceValues() {
         config = new ApplicationConfig(this.getApplicationContext());
-        config.unsetBoolean(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_KEY_HAS_ACCOUNT);
         config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_AUTH_TOKEN);
-        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_ENDPOINT);
-        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_STORAGE);
-        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_APIKEY);
-        config.unsetString(com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_USER_USERNAME);
     }
 
     /**

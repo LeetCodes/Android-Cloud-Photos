@@ -128,7 +128,7 @@ public class RackspaceCloudAccount {
      */
     public void authenticationFailed() {
         dialoglayout.setVisibility(View.VISIBLE);
-        Log.v("CloudPhotos", "Authentication failed");
+        Log.i("CloudPhotos", "Authentication failed");
         TextView tv = (TextView) dialoglayout.findViewById(R.id.authentication_failed);
         tv.setVisibility(View.VISIBLE);
     }
