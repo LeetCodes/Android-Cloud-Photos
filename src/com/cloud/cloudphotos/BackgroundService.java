@@ -26,7 +26,6 @@ import com.cloud.cloudphotos.data.Photo;
 import com.cloud.cloudphotos.data.PhotoDatasource;
 import com.cloud.cloudphotos.helper.NetworkConnection;
 import com.cloud.cloudphotos.provider.rackspace.RackspaceHttpClient;
-import com.cloud.cloudphotos.provider.rackspace.Setup;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -57,7 +56,7 @@ public class BackgroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null) {
             config = new ApplicationConfig(this.getApplicationContext());
-            config.unsetString(Setup.PREFS_AUTH_TOKEN);
+
             if (intent.getAction().endsWith("NEW_PICTURE")) {
                 Uri uri = intent.getData();
                 String filePath = getPathFromUri(uri);
