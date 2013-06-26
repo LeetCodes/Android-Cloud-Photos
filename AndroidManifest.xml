@@ -20,10 +20,12 @@
         android:theme="@style/AppTheme" >
         <service
             android:name="com.cloud.cloudphotos.BackgroundService"
+            android:process=":BackgroundService"
             android:label="BackgroundService" />
 
         <receiver
             android:name="com.cloud.cloudphotos.BackgroundServiceStarter"
+            android:process=":BackgroundServiceStarter"
             android:label="BackgroundServiceStarter" >
             <intent-filter>
                 <action android:name="com.android.camera.NEW_PICTURE" />

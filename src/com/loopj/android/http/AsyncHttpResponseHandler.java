@@ -14,15 +14,13 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-*/
+ */
 
 package com.loopj.android.http;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import org.apache.http.Header;
 import java.io.IOException;
+
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -30,28 +28,30 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.util.EntityUtils;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
 /**
- * Used to intercept and handle the responses from requests made using 
- * {@link AsyncHttpClient}. The {@link #onSuccess(String)} method is 
- * designed to be anonymously overridden with your own response handling code.
+ * Used to intercept and handle the responses from requests made using
+ * {@link AsyncHttpClient}. The {@link #onSuccess(String)} method is designed to
+ * be anonymously overridden with your own response handling code.
  * <p>
  * Additionally, you can override the {@link #onFailure(Throwable, String)},
  * {@link #onStart()}, and {@link #onFinish()} methods as required.
  * <p>
  * For example:
  * <p>
+ * 
  * <pre>
  * AsyncHttpClient client = new AsyncHttpClient();
- * client.get("http://www.google.com", new AsyncHttpResponseHandler() {
+ * client.get(&quot;http://www.google.com&quot;, new AsyncHttpResponseHandler() {
  *     &#064;Override
  *     public void onStart() {
  *         // Initiated the request
  *     }
- *
+ * 
  *     &#064;Override
  *     public void onSuccess(String response) {
  *         // Successfully got a response
@@ -61,7 +61,7 @@ import android.os.Message;
  *     public void onFailure(Throwable e, String response) {
  *         // Response failed :(
  *     }
- *
+ * 
  *     &#064;Override
  *     public void onFinish() {
  *         // Completed the request (either success or failure)
@@ -80,18 +80,19 @@ public class AsyncHttpResponseHandler {
     /**
      * Creates a new AsyncHttpResponseHandler
      */
+    @SuppressLint("HandlerLeak")
     public AsyncHttpResponseHandler() {
-        // Set up a handler to post events back to the correct thread if possible
-        if(Looper.myLooper() != null) {
-            handler = new Handler(){
+        // Set up a handler to post events back to the correct thread if
+        // possible
+        if (Looper.myLooper() != null) {
+            handler = new Handler() {
                 @Override
-                public void handleMessage(Message msg){
+                public void handleMessage(Message msg) {
                     AsyncHttpResponseHandler.this.handleMessage(msg);
                 }
             };
         }
     }
-
 
     //
     // Callbacks to be overridden, typically anonymously
@@ -100,72 +101,96 @@ public class AsyncHttpResponseHandler {
     /**
      * Fired when the request is started, override to handle in your own code
      */
-    public void onStart() {}
+    public void onStart() {
+    }
 
     /**
-     * Fired in all cases when the request is finished, after both success and failure, override to handle in your own code
+     * Fired in all cases when the request is finished, after both success and
+     * failure, override to handle in your own code
      */
-    public void onFinish() {}
+    public void onFinish() {
+    }
 
     /**
-     * Fired when a request returns successfully, override to handle in your own code
-     * @param content the body of the HTTP response from the server
+     * Fired when a request returns successfully, override to handle in your own
+     * code
+     * 
+     * @param content
+     *            the body of the HTTP response from the server
      */
-    public void onSuccess(String content) {}
+    public void onSuccess(String content) {
+    }
 
     /**
-     * Fired when a request returns successfully, override to handle in your own code
-     * @param statusCode the status code of the response
-     * @param headers the headers of the HTTP response
-     * @param content the body of the HTTP response from the server
+     * Fired when a request returns successfully, override to handle in your own
+     * code
+     * 
+     * @param statusCode
+     *            the status code of the response
+     * @param headers
+     *            the headers of the HTTP response
+     * @param content
+     *            the body of the HTTP response from the server
      */
     public void onSuccess(int statusCode, Header[] headers, String content) {
         onSuccess(statusCode, content);
     }
 
     /**
-     * Fired when a request returns successfully, override to handle in your own code
-     * @param statusCode the status code of the response
-     * @param content the body of the HTTP response from the server
+     * Fired when a request returns successfully, override to handle in your own
+     * code
+     * 
+     * @param statusCode
+     *            the status code of the response
+     * @param content
+     *            the body of the HTTP response from the server
      */
-    public void onSuccess(int statusCode, String content)
-    {
+    public void onSuccess(int statusCode, String content) {
         onSuccess(content);
     }
 
     /**
-     * Fired when a request fails to complete, override to handle in your own code
-     * @param error the underlying cause of the failure
+     * Fired when a request fails to complete, override to handle in your own
+     * code
+     * 
+     * @param error
+     *            the underlying cause of the failure
      * @deprecated use {@link #onFailure(Throwable, String)}
      */
     @Deprecated
-    public void onFailure(Throwable error) {}
-
-    /**
-     * Fired when a request fails to complete, override to handle in your own code
-     * @param error the underlying cause of the failure
-     * @param content the response body, if any
-     */
-    public void onFailure(Throwable error, String content) {
-        // By default, call the deprecated onFailure(Throwable) for compatibility
-        onFailure(error);
+    public void onFailure(Throwable error) {
     }
 
+    /**
+     * Fired when a request fails to complete, override to handle in your own
+     * code
+     * 
+     * @param error
+     *            the underlying cause of the failure
+     * @param content
+     *            the response body, if any
+     */
+    public void onFailure(Throwable error, String content) {
+        // By default, call the deprecated onFailure(Throwable) for
+        // compatibility
+        onFailure(error);
+    }
 
     //
     // Pre-processing of messages (executes in background threadpool thread)
     //
 
+    @SuppressLint("UseValueOf")
     protected void sendSuccessMessage(int statusCode, Header[] headers, String responseBody) {
-        sendMessage(obtainMessage(SUCCESS_MESSAGE, new Object[]{new Integer(statusCode), headers, responseBody}));
+        sendMessage(obtainMessage(SUCCESS_MESSAGE, new Object[] { new Integer(statusCode), headers, responseBody }));
     }
 
     protected void sendFailureMessage(Throwable e, String responseBody) {
-        sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[]{e, responseBody}));
+        sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[] { e, responseBody }));
     }
-    
+
     protected void sendFailureMessage(Throwable e, byte[] responseBody) {
-        sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[]{e, responseBody}));
+        sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[] { e, responseBody }));
     }
 
     protected void sendStartMessage() {
@@ -176,9 +201,9 @@ public class AsyncHttpResponseHandler {
         sendMessage(obtainMessage(FINISH_MESSAGE, null));
     }
 
-
     //
-    // Pre-processing of messages (in original calling thread, typically the UI thread)
+    // Pre-processing of messages (in original calling thread, typically the UI
+    // thread)
     //
 
     protected void handleSuccessMessage(int statusCode, Header[] headers, String responseBody) {
@@ -189,32 +214,30 @@ public class AsyncHttpResponseHandler {
         onFailure(e, responseBody);
     }
 
-
-
     // Methods which emulate android's Handler and Message methods
     protected void handleMessage(Message msg) {
         Object[] response;
 
-        switch(msg.what) {
-            case SUCCESS_MESSAGE:
-                response = (Object[])msg.obj;
-                handleSuccessMessage(((Integer) response[0]).intValue(), (Header[]) response[1], (String) response[2]);
-                break;
-            case FAILURE_MESSAGE:
-                response = (Object[])msg.obj;
-                handleFailureMessage((Throwable)response[0], (String)response[1]);
-                break;
-            case START_MESSAGE:
-                onStart();
-                break;
-            case FINISH_MESSAGE:
-                onFinish();
-                break;
+        switch (msg.what) {
+        case SUCCESS_MESSAGE:
+            response = (Object[]) msg.obj;
+            handleSuccessMessage(((Integer) response[0]).intValue(), (Header[]) response[1], (String) response[2]);
+            break;
+        case FAILURE_MESSAGE:
+            response = (Object[]) msg.obj;
+            handleFailureMessage((Throwable) response[0], (String) response[1]);
+            break;
+        case START_MESSAGE:
+            onStart();
+            break;
+        case FINISH_MESSAGE:
+            onFinish();
+            break;
         }
     }
 
     protected void sendMessage(Message msg) {
-        if(handler != null){
+        if (handler != null) {
             handler.sendMessage(msg);
         } else {
             handleMessage(msg);
@@ -223,9 +246,9 @@ public class AsyncHttpResponseHandler {
 
     protected Message obtainMessage(int responseMessage, Object response) {
         Message msg = null;
-        if(handler != null){
+        if (handler != null) {
             msg = this.handler.obtainMessage(responseMessage, response);
-        }else{
+        } else {
             msg = Message.obtain();
             msg.what = responseMessage;
             msg.obj = response;
@@ -240,16 +263,17 @@ public class AsyncHttpResponseHandler {
         try {
             HttpEntity entity = null;
             HttpEntity temp = response.getEntity();
-            if(temp != null) {
+            if (temp != null) {
                 entity = new BufferedHttpEntity(temp);
                 responseBody = EntityUtils.toString(entity, "UTF-8");
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             sendFailureMessage(e, (String) null);
         }
 
-        if(status.getStatusCode() >= 300) {
-            sendFailureMessage(new HttpResponseException(status.getStatusCode(), status.getReasonPhrase()), responseBody);
+        if (status.getStatusCode() >= 300) {
+            sendFailureMessage(new HttpResponseException(status.getStatusCode(), status.getReasonPhrase()),
+                    responseBody);
         } else {
             sendSuccessMessage(status.getStatusCode(), response.getAllHeaders(), responseBody);
         }

@@ -15,7 +15,6 @@ import android.widget.ImageView;
 
 public class LazyImageViewLoader extends AsyncTask<Integer, Void, Bitmap> {
     private final WeakReference<ImageView> imageViewRef;
-    private final int data = 0;
     private final File fileRef;
 
     public LazyImageViewLoader(ImageView imageView, File file) {

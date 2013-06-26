@@ -29,8 +29,6 @@ public class CloudPhotos extends Activity {
         cachePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CloudPhotos-Cache";
         makeCacheFolder();
         gridView = (GridView) findViewById(R.id.grid_view);
-        Intent ws = new Intent(this, BackgroundService.class);
-        startService(ws);
         listFiles();
     }
 
