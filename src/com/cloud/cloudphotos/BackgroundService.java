@@ -310,6 +310,9 @@ public class BackgroundService extends Service {
                 }
             });
 
+        } else {
+            isRunning = false;
+            this.stopSelf();
         }
     }
 

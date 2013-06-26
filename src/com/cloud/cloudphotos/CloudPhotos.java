@@ -37,11 +37,9 @@ public class CloudPhotos extends Activity {
     private void listFiles() {
 
         File[] files = SortFiles.getDirectoryList(cachePath);
-
-        gridView.setAdapter(new CachedImagesAdapter(this, files));
-        for (File file : files) {
-            Log.i("CloudPhotos", file.getPath());
-        }
+        CachedImagesAdapter adapter = new CachedImagesAdapter(this, files);
+        gridView.setAdapter(adapter);
+        Log.i("CloudPhotos", String.valueOf(files.length) + " files");
         gridView.setOnScrollListener(new OnScrollListener() {
 
             @Override
@@ -58,6 +56,7 @@ public class CloudPhotos extends Activity {
             }
 
         });
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -79,6 +78,9 @@ public class CloudPhotos extends Activity {
             Intent settings = new Intent(this, ApplicationSettings.class);
             startActivity(settings);
             overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
+            return true;
+        case R.id.action_refresh:
+            listFiles();
             return true;
         }
         return super.onOptionsItemSelected(item);

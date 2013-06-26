@@ -1,12 +1,7 @@
 package com.cloud.cloudphotos.helper;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -27,34 +22,15 @@ public class BitmapCacheHelper extends AsyncTask<Integer, Void, String> {
     @Override
     protected String doInBackground(Integer... params) {
         try {
-            BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inDither = true;
-            opts.inPurgeable = true;
-            opts.inInputShareable = true;
-            InputStream in = null;
-            Bitmap bm = null;
-            Bitmap resized = null;
-            try {
-                in = new BufferedInputStream(new FileInputStream(fileRef));
-                bm = BitmapFactory.decodeStream(in);
-                resized = getResizedBitmap(bm, params[0], params[1]);
-                File fileNew = new File(cachePath, fileName);
-                FileOutputStream fOutStream = new FileOutputStream(fileNew);
-                resized.compress(Bitmap.CompressFormat.JPEG, params[2], fOutStream);
-                fOutStream.flush();
-                fOutStream.close();
-            } catch (FileNotFoundException e) {
-
-            } finally {
-                resized.recycle();
-                bm.recycle();
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e) {
-                    }
-                }
-            }
+            Bitmap bmBig = BitmapFactory.decodeFile(fileRef.getPath());
+            Bitmap resized = getResizedBitmap(bmBig, params[0], params[1]);
+            bmBig.recycle();
+            File fileNew = new File(cachePath, fileName);
+            FileOutputStream fOutStream = new FileOutputStream(fileNew);
+            resized.compress(Bitmap.CompressFormat.JPEG, params[2], fOutStream);
+            fOutStream.flush();
+            fOutStream.close();
+            resized.recycle();
         } catch (Exception e) {
 
         }

@@ -4,6 +4,7 @@
     <string name="app_name">Cloud Photos</string>
     <string name="app_name_regular">CloudPhotos</string>
     <string name="action_settings">Settings</string>
+    <string name="refresh">Refresh</string>
     <string name="hello_world">Hello world!</string>
     <string name="accounts">Accounts</string>
     <string name="my_cloudphotos">My CloudPhotos</string>
