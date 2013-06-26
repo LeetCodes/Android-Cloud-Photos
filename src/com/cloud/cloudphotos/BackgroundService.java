@@ -1,7 +1,6 @@
 package com.cloud.cloudphotos;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Random;
@@ -15,9 +14,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
@@ -29,6 +25,7 @@ import android.webkit.MimeTypeMap;
 
 import com.cloud.cloudphotos.data.Photo;
 import com.cloud.cloudphotos.data.PhotoDatasource;
+import com.cloud.cloudphotos.helper.BitmapCacheHelper;
 import com.cloud.cloudphotos.helper.NetworkConnection;
 import com.cloud.cloudphotos.provider.rackspace.RackspaceHttpClient;
 import com.loopj.android.http.AsyncHttpClient;
@@ -155,7 +152,7 @@ public class BackgroundService extends Service {
                     }
                 }
             }
-        }, 2000);
+        }, 4000);
 
     }
 
@@ -218,27 +215,11 @@ public class BackgroundService extends Service {
 
     private void generateCached(File file, String cachePath, String fileName) {
         try {
-            Bitmap bmBig = BitmapFactory.decodeFile(file.getPath());
-            Bitmap resized = getResizedBitmap(bmBig, 200, 200);
-            File fileNew = new File(cachePath, fileName);
-            FileOutputStream fOutStream = new FileOutputStream(fileNew);
-            resized.compress(Bitmap.CompressFormat.JPEG, 80, fOutStream);
-            fOutStream.flush();
-            fOutStream.close();
+            BitmapCacheHelper helper = new BitmapCacheHelper(file, cachePath, fileName);
+            helper.execute(200, 200, 60);
         } catch (Exception e) {
 
         }
-    }
-
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-        return resizedBitmap;
     }
 
     /**
