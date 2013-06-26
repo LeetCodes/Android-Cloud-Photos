@@ -265,6 +265,7 @@ public class BackgroundService extends Service {
                     com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_URL_STORAGE, "");
             final String containerName = config.getString(
                     com.cloud.cloudphotos.provider.rackspace.Setup.PREFS_CONTAINER_NAME, "");
+            @SuppressWarnings("deprecation")
             String url = storageUrl + "/" + URLEncoder.encode(containerName) + "/" + URLEncoder.encode(fileName);
             AsyncHttpClient client = clientFactory.getAuthenticatedStorageClient(authToken);
 
