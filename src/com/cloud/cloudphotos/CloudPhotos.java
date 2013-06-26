@@ -85,6 +85,12 @@ public class CloudPhotos extends Activity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        listFiles();
+    }
+
+    @Override
     public void onBackPressed() {
         overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
         super.onBackPressed();
