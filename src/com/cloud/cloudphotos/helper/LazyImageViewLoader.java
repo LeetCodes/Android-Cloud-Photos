@@ -1,6 +1,11 @@
 package com.cloud.cloudphotos.helper;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 import android.graphics.Bitmap;
@@ -21,14 +26,23 @@ public class LazyImageViewLoader extends AsyncTask<Integer, Void, Bitmap> {
     // Decode image in background.
     @Override
     protected Bitmap doInBackground(Integer... params) {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inDither = true;
-        opts.inPurgeable = true;
-        opts.inInputShareable = true;
-        opts.outHeight = 200;
-        opts.outWidth = 200;
-        Bitmap bitmap = BitmapFactory.decodeFile(fileRef.getPath(), opts);
-        return bitmap;
+        InputStream in = null;
+        Bitmap bm = null;
+        try {
+            in = new BufferedInputStream(new FileInputStream(fileRef));
+            bm = BitmapFactory.decodeStream(in);
+        } catch (FileNotFoundException e) {
+
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return bm;
+
     }
 
     @Override
