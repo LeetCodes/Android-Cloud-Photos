@@ -1,11 +1,14 @@
 package com.cloud.cloudphotos;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,11 +16,14 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.cloud.cloudphotos.helper.SortFiles;
+
 public class ApplicationSettings extends Activity {
 
     ApplicationConfig config;
     final Context context = this;
     Boolean wifiOnly = true;
+    String cachePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +31,40 @@ public class ApplicationSettings extends Activity {
         setContentView(R.layout.activity_application_settings);
         config = new ApplicationConfig(getApplicationContext());
         wifiOnly = config.getBoolean("wifionly", true);
+        cachePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CloudPhotos-Cache";
+        makeCacheFolder();
         bindEditConnection();
+        bindClearCache();
+    }
+
+    private void bindClearCache() {
+        Button btnCache = (Button) findViewById(R.id.cache_button);
+        btnCache.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                alert.setTitle("Clear Cache");
+                alert.setMessage("Are you sure you want to clear the cache?\n\nClearing cache will remove small thumbnails stored on your device, but will not delete them from your storage provider.");
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        doClearCache();
+                    }
+                });
+                alert.setNegativeButton("Cancel", null);
+                alert.setCancelable(false);
+                alert.show();
+            }
+        });
+    }
+
+    private void doClearCache() {
+        File[] files = SortFiles.getDirectoryList(cachePath);
+        for (File file : files) {
+            if (file.isFile()) {
+                file.delete();
+            }
+        }
     }
 
     private void bindEditConnection() {
@@ -98,5 +137,12 @@ public class ApplicationSettings extends Activity {
     public void onBackPressed() {
         overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
         super.onBackPressed();
+    }
+
+    private void makeCacheFolder() {
+        File dir = new File(cachePath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
     }
 }
