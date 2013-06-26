@@ -51,6 +51,10 @@ public class BackgroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (isRunning == false) {
+            datasource = new PhotoDatasource(activityContext);
+            datasource.open();
+        }
         isRunning = true;
         Log.i(TAG, "CloudPhotos service created");
         makeCacheFolder();
@@ -87,6 +91,7 @@ public class BackgroundService extends Service {
                 // Connection change.
                 evaluateCanRun();
             }
+            notifyStarted();
         } else {
             Log.i(TAG, "CloudPhotos service created");
         }
@@ -134,8 +139,6 @@ public class BackgroundService extends Service {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                datasource = new PhotoDatasource(activityContext);
-                datasource.open();
                 List<Photo> photos = datasource.getAllPhotos();
                 for (Photo photo : photos) {
                     try {
@@ -153,12 +156,10 @@ public class BackgroundService extends Service {
                 }
             }
         }, 4000);
-
     }
 
     public void uploadPhoto(File photo, String fileName, Photo model) {
         try {
-            notifyStarted();
             runProviders(photo, fileName, model);
         } catch (Exception e) {
             Log.i(TAG, "CloudPhotos: Error processing providers for photo: " + model.getId());

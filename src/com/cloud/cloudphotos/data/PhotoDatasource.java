@@ -11,17 +11,18 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class PhotoDatasource {
 
-    private SQLiteDatabase database;
+    private final SQLiteDatabase database;
     private final SqlitePhotoStorage dbHelper;
     private final String[] allColumns = { SqlitePhotoStorage.COLUMN_ID, SqlitePhotoStorage.COLUMN_PATH,
             SqlitePhotoStorage.COLUMN_DATESTAMP };
 
     public PhotoDatasource(Context context) {
         dbHelper = new SqlitePhotoStorage(context);
+        database = dbHelper.getWritableDatabase();
     }
 
     public void open() throws SQLException {
-        database = dbHelper.getWritableDatabase();
+        // database = dbHelper.getWritableDatabase();
     }
 
     public void close() {
