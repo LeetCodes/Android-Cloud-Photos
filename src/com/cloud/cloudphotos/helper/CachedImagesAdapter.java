@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import com.cloud.cloudphotos.CloudPhotos;
 import com.cloud.cloudphotos.R;
 
 public class CachedImagesAdapter extends BaseAdapter {
@@ -22,12 +23,14 @@ public class CachedImagesAdapter extends BaseAdapter {
     Context mContext;
     String cachePath;
     CachedImagesAdapter adapter = this;
+    CloudPhotos cloudPhotosContext;
 
     // Constructor
-    public CachedImagesAdapter(Context c, File[] fileList, String cacheDir) {
+    public CachedImagesAdapter(Context c, File[] fileList, String cacheDir, CloudPhotos thisContext) {
         mContext = c;
         files = fileList;
         cachePath = cacheDir;
+        cloudPhotosContext = thisContext;
     }
 
     @Override
@@ -76,7 +79,7 @@ public class CachedImagesAdapter extends BaseAdapter {
                         File f = new File(cachePath, item.getName());
                         Boolean deleted = f.delete();
                         if (deleted) {
-                            imageView.setVisibility(View.GONE);
+                            cloudPhotosContext.listFiles();
                         }
                     }
                 });
