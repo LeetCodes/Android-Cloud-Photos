@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
+import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 
 public class BitmapCacheHelper extends AsyncTask<Integer, Void, String> {
@@ -22,9 +22,8 @@ public class BitmapCacheHelper extends AsyncTask<Integer, Void, String> {
     @Override
     protected String doInBackground(Integer... params) {
         try {
-            Bitmap bmBig = BitmapFactory.decodeFile(fileRef.getPath());
-            Bitmap resized = getResizedBitmap(bmBig, params[0], params[1]);
-            bmBig.recycle();
+            Bitmap resized = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(fileRef.getPath()), params[1],
+                    params[0]);
             File fileNew = new File(cachePath, fileName);
             FileOutputStream fOutStream = new FileOutputStream(fileNew);
             resized.compress(Bitmap.CompressFormat.JPEG, params[2], fOutStream);
@@ -35,17 +34,6 @@ public class BitmapCacheHelper extends AsyncTask<Integer, Void, String> {
 
         }
         return null;
-    }
-
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-        return resizedBitmap;
     }
 
     @Override

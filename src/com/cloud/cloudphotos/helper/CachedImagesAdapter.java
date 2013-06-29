@@ -2,11 +2,14 @@ package com.cloud.cloudphotos.helper;
 
 import java.io.File;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -17,11 +20,14 @@ public class CachedImagesAdapter extends BaseAdapter {
 
     File[] files;
     Context mContext;
+    String cachePath;
+    CachedImagesAdapter adapter = this;
 
     // Constructor
-    public CachedImagesAdapter(Context c, File[] fileList) {
+    public CachedImagesAdapter(Context c, File[] fileList, String cacheDir) {
         mContext = c;
         files = fileList;
+        cachePath = cacheDir;
     }
 
     @Override
@@ -40,8 +46,8 @@ public class CachedImagesAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView = new ImageView(mContext);
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ImageView imageView = new ImageView(mContext);
         imageView.setMinimumWidth(200);
         imageView.setMinimumHeight(200);
         Drawable placeholder = mContext.getResources().getDrawable(R.drawable.ic_launcher);
@@ -54,6 +60,30 @@ public class CachedImagesAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Log.i("CloudPhotos", "Clicked : " + item.getName());
+            }
+
+        });
+        imageView.setOnLongClickListener(new OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+                alert.setTitle("Delete Photo");
+                alert.setMessage("Delete this cached thumbnail?\n\nThis will not delete it from your storage provider.");
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        File f = new File(cachePath, item.getName());
+                        Boolean deleted = f.delete();
+                        if (deleted) {
+                            imageView.setVisibility(View.GONE);
+                        }
+                    }
+                });
+                alert.setNegativeButton("Cancel", null);
+                alert.setCancelable(false);
+                alert.show();
+                return true;
             }
 
         });
