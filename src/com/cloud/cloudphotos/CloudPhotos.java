@@ -4,6 +4,7 @@ import java.io.File;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -35,7 +36,7 @@ public class CloudPhotos extends Activity {
     private void listFiles() {
 
         File[] files = SortFiles.getDirectoryList(cachePath);
-        CachedImagesAdapter adapter = new CachedImagesAdapter(this, files);
+        CachedImagesAdapter adapter = new CachedImagesAdapter(this, files, cachePath);
         gridView.setAdapter(adapter);
         Log.i("CloudPhotos", String.valueOf(files.length) + " files");
         gridView.setOnScrollListener(new OnScrollListener() {
