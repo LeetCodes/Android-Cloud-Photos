@@ -33,6 +33,10 @@ public class CloudPhotos extends Activity {
         listFiles();
     }
 
+    public void loadPhoto(String photoName) {
+        Log.i("CloudPhotos", "Clicked: " + photoName);
+    }
+
     public void listFiles() {
 
         File[] files = SortFiles.getDirectoryList(cachePath);

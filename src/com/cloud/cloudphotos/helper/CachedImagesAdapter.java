@@ -62,7 +62,19 @@ public class CachedImagesAdapter extends BaseAdapter {
 
             @Override
             public void onClick(View v) {
-                Log.i("CloudPhotos", "Clicked : " + item.getName());
+                AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+                alert.setTitle("Download Photo?");
+                alert.setMessage("Do you want to download this photo? This may incur charges from your provider");
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String name = item.getName();
+                        cloudPhotosContext.loadPhoto(name);
+                    }
+                });
+                alert.setNegativeButton("Cancel", null);
+                alert.setCancelable(false);
+                alert.show();
             }
 
         });

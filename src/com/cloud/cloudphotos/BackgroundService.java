@@ -61,10 +61,12 @@ public class BackgroundService extends Service {
     }
 
     private void makeCacheFolder() {
-        cachePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CloudPhotos-Cache";
-        File dir = new File(cachePath);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            cachePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/CloudPhotos-Cache";
+            File dir = new File(cachePath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
         }
     }
 
@@ -121,6 +123,9 @@ public class BackgroundService extends Service {
     }
 
     private void evaluateCanRun() {
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            return;
+        }
         Boolean wifiOnly = config.getBoolean("wifionly", true);
         if (wifiOnly) {
             // check if connected to wifi.
